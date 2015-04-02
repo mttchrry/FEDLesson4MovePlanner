@@ -1,18 +1,18 @@
 
 
-// function displayArticles(data) {
-//   console.log('JSON data is : '+ data);
-//   // var items = [];
-//   // $.each( data, function( key, val) {
-//   //   items.push("<li id='" + key + "'>" + val + "</li>" );
-//   // });
+function displayArticles(data) {
+  console.log(data);
+  // var items = [];
+  // $.each( data, function( key, val) {
+  //   items.push("<li id='" + key + "'>" + val + "</li>" );
+  // });
 
-//   // $( "<ul/>", {
-//   //   "class": "my-new-list",
-//   //   html: items.join( "" )
-//   // }).appendTo( "body" );
-//   //   }
-// }
+  // $( "<ul/>", {
+  //   "class": "my-new-list",
+  //   html: items.join( "" )
+  // }).appendTo( "body" );
+  //   }
+}
 
 
 function loadData() {
@@ -32,8 +32,6 @@ function loadData() {
     // YOUR CODE GOES HERE!
     var inputStreet = $('#street').val();
     var inputCity = $('#city').val();
-    console.log(inputStreet);
-    console.log(inputCity);
     var address = inputStreet + ', ' + inputCity;
     var streetimgaddress = 'https://maps.googleapis.com/maps/api/streetview?location=' +
          address + '&size=600x400';
@@ -42,10 +40,20 @@ function loadData() {
 
     $greeting.text('So, you want to live at '+ address+ '?');
     var NytQueryUrl = 'http://api.nytimes.com/svc/search/v2/articlesearch.json?q='+
-        inputCity +'&sort=newest&api-key=ec612587cb260600bc67a560ab4342ef:8:71766984';
-    console.log(NytQueryUrl);
-    $.getJSON(NytQueryUrl, function(data){
+        inputCity +'&api-key=ec612587cb260600bc67a560ab4342ef:8:71766984';
+
+    $.getJSON(NytQueryUrl, function (data){
         console.log(data);
+        //var JsonData = JSON.parse(data);
+
+        var articles = data.response.docs
+        console.log(articles);
+        var responseSize = data.response.docs.length;
+        for (var i=0; i< responseSize; i++){
+            var article = articles[i];
+            header = article.headline.main;
+            console.log('ArticleTitles are : ' + header);
+        }
     });
 
     return false;
