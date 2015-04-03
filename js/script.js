@@ -1,20 +1,4 @@
 
-
-function displayArticles(data) {
-  console.log(data);
-  // var items = [];
-  // $.each( data, function( key, val) {
-  //   items.push("<li id='" + key + "'>" + val + "</li>" );
-  // });
-
-  // $( "<ul/>", {
-  //   "class": "my-new-list",
-  //   html: items.join( "" )
-  // }).appendTo( "body" );
-  //   }
-}
-
-
 function loadData() {
 
     var $body = $('body');
@@ -28,33 +12,58 @@ function loadData() {
     $nytElem.text("");
 
     // load streetview
-    //$('.bgimg').remove();
-    // YOUR CODE GOES HERE!
     var inputStreet = $('#street').val();
     var inputCity = $('#city').val();
     var address = inputStreet + ', ' + inputCity;
+    $greeting.text('So, you want to live at '+ address+ '?');
+
+
     var streetimgaddress = 'https://maps.googleapis.com/maps/api/streetview?location=' +
          address + '&size=600x400';
-    console.log(address);
     $body.append('<img class="bgimg" src="'+ streetimgaddress + '">');
 
-    $greeting.text('So, you want to live at '+ address+ '?');
+
     var NytQueryUrl = 'http://api.nytimes.com/svc/search/v2/articlesearch.json?q='+
         inputCity +'&api-key=ec612587cb260600bc67a560ab4342ef:8:71766984';
 
     $.getJSON(NytQueryUrl, function (data){
         console.log(data);
         //var JsonData = JSON.parse(data);
-
+        $nytHeaderElem.text("New York Times Articles for "+inputCity);
         var articles = data.response.docs
-        console.log(articles);
         var responseSize = data.response.docs.length;
         for (var i=0; i< responseSize; i++){
             var article = articles[i];
             header = article.headline.main;
-            console.log('ArticleTitles are : ' + header);
+           //console.log('ArticleTitles are : ' + header);
+            $nytElem.append('<li class="article">'+
+                '<a href="'+article.web_url+'">'+article.headline.main+'</a>'+
+                '<p>'+article.snippet+'</p></li>');
         }
+    }).error(function(){
+        $nytHeaderElem.text("New York Times Articles Could Not Be Loaded");
     });
+
+    var wikiQueryUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' +
+        inputCity + '&format=json&callback=wikiCallback';
+
+    $.ajax({
+        url: wikiQueryUrl,
+        dataType: "jsonp",
+        jsonp: "callback",
+        success: function( response ) {
+            var articleList = response[1];
+            for (var i=0; i<articleList.length; i++) {
+                var wikiArticle = articleList[i];
+                var wikiArticleUrl = 'https://wikipedia.org/wiki/'+wikiArticle;
+                $wikiElem.append('<li><a href="'+wikiArticleUrl+'">'+wikiArticle
+                    +'</a></li>');
+            }
+        },
+        // error: function(response) {
+        //     $wikiElem.text("Couldn't load links");
+        // }
+    })
 
     return false;
 };
